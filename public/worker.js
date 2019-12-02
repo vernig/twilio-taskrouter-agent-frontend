@@ -1,4 +1,4 @@
-fetch('/get-token')
+fetch('/get-token?workerSid=' + WORKER_SID)
   .then(response => response.text())
   .then(response => {
     const WORKER_TOKEN = response;
@@ -20,9 +20,18 @@ fetch('/get-token')
       const button = document.getElementById('button-accept');
       button.disabled = false;
       button.onclick = () => {
+        // reservation.conference()
         fetch(
           `/create-conference?TaskSid=${reservation.taskSid}&ReservationSid=${reservation.sid}`
         );
       };
     });
+
+    worker.on('reservation.accepted', function(reservation) {
+      const button = document.getElementById('button-transfer');
+      button.disabled = false;
+      button.onclick = () => {
+        fetch(`/transfer?task_sid=${reservation.taskSid}&workspace=${reservation.workspaceSid}`)
+      }
+    })
   });
