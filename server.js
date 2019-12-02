@@ -59,8 +59,40 @@ app.get('/create-conference', function(request, response) {
     });
 });
 
+app.get('/transfer', function(request, response) {
+  client.taskrouter.workspaces(request.query.workspace)
+     .tasks(request.query.task_sid)
+     .fetch()
+     .then(task => {
+        console.log('old task fetched')
+        var taskAttributes = JSON.parse(task.attributes);
+        taskAttributes.worker_name = "John Doe"
+        client.taskrouter
+          .workspaces(request.query.workspace)
+          .tasks
+          .create({taskChannel: 'voice', attributes: JSON.stringify(taskAttributes)})
+          .then(newTask => {
+            console.log('New task created')
+            // Remove worker from the first conference 
+            console.log(`Removing worker ${taskAttributes.conference.participants.worker} from conference ${taskAttributes.conference.sid}`)
+            return client.conferences(taskAttributes.conference.sid)
+            .participants(taskAttributes.conference.participants.worker)
+            .remove()
+          })
+          .then(() => {
+             console.log('Worker removed from conference') 
+             response.send('');
+          })
+     })
+     .catch(error => {
+         console.log(error)
+         response.send('')
+     })
+
+})
+
 /**
- * Get TaskRouter tokern for worker
+ * Get TaskRouter token for worker
  */
 app.get('/get-token', function(request, response) {
   const taskrouter = require('twilio').jwt.taskrouter;
@@ -72,7 +104,7 @@ app.get('/get-token', function(request, response) {
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_ACCOUNT_SECRET;
   const workspaceSid = process.env.TWILIO_TR_WORKSPACE_SID;
-  const workerSid = process.env.TWILIO_TR_WORKER_SID;
+  const workerSid = request.query.workerSid;
 
   const TASKROUTER_BASE_URL = 'https://taskrouter.twilio.com';
   const version = 'v1';
@@ -83,6 +115,8 @@ app.get('/get-token', function(request, response) {
     workspaceSid: workspaceSid,
     channelId: workerSid
   });
+
+  console.log('Received token request for ' + workerSid)
 
   // Helper function to create Policy
   function buildWorkspacePolicy(options) {
