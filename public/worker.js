@@ -20,7 +20,6 @@ fetch('/get-token?workerSid=' + WORKER_SID)
       const button = document.getElementById('button-accept');
       button.disabled = false;
       button.onclick = () => {
-        // reservation.conference()
         fetch(
           `/create-conference?TaskSid=${reservation.taskSid}&ReservationSid=${reservation.sid}`
         );
