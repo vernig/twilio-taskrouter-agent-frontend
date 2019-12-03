@@ -105,7 +105,7 @@ function registerWorker(workerSid) {
 }
 
 if (!WORKER_SID) {
-  windows.alert('Provide worker sid in the url: e.g. http://yourserver.com/worker.html?workerSid=WKXXXX')
+  window.alert('Provide worker sid in the url: e.g. http://yourserver.com/worker.html?workerSid=WKXXXX')
   // log('WORKER_SID variable missing!', 'error');
 } else {
   registerWorker(WORKER_SID);
