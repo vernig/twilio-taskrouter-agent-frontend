@@ -20,6 +20,7 @@ fetch('/get-token?workerSid=' + WORKER_SID)
       const button = document.getElementById('button-accept');
       button.disabled = false;
       button.onclick = () => {
+        button.disabled = true;
         fetch(
           `/create-conference?TaskSid=${reservation.taskSid}&ReservationSid=${reservation.sid}`
         );
@@ -30,6 +31,7 @@ fetch('/get-token?workerSid=' + WORKER_SID)
       const button = document.getElementById('button-transfer');
       button.disabled = false;
       button.onclick = () => {
+        button.disabled = true;
         fetch(`/transfer?task_sid=${reservation.taskSid}&workspace=${reservation.workspaceSid}`)
       }
     })
