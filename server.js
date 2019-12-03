@@ -150,6 +150,7 @@ app.get('/get-token', function(request, response) {
     buildWorkspacePolicy(),
     // Workspace subresources fetch Policy
     buildWorkspacePolicy({ resources: ['**'] }),
+    buildWorkspacePolicy({ resources: ['**'], method: 'POST' }),
     // Workspace Activities Update Policy
     buildWorkspacePolicy({ resources: ['Activities'], method: 'POST' }),
     // Workspace Activities Worker Reserations Policy

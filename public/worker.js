@@ -21,9 +21,11 @@ fetch('/get-token?workerSid=' + WORKER_SID)
       button.disabled = false;
       button.onclick = () => {
         button.disabled = true;
-        fetch(
-          `/create-conference?TaskSid=${reservation.taskSid}&ReservationSid=${reservation.sid}`
-        );
+        reservation.conference()
+
+        // fetch(
+        //   `/create-conference?TaskSid=${reservation.taskSid}&ReservationSid=${reservation.sid}`
+        // );
       };
     });
 
