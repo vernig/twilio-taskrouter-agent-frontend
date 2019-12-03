@@ -37,54 +37,56 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-app.get('/create-conference', function(request, response) {
+app.get('/transfer', function(request, response) {
   client.taskrouter
-    .workspaces(process.env.TWILIO_TR_WORKSPACE_SID)
-    .tasks(request.query.TaskSid)
-    .reservations(request.query.ReservationSid)
-    .update({
-      instruction: 'conference'
-    })
-    .then(reservation => {
-      console.log(`Conference established with worker: ${reservation.workerName}`);
-      response.send();
+    .workspaces(request.query.workspace)
+    .tasks(request.query.task_sid)
+    .fetch()
+    .then(task => {
+      console.log('old task fetched');
+      var taskAttributes = JSON.parse(task.attributes);
+      taskAttributes.worker_name = process.env.AGENT2_NAME;
+      client.taskrouter
+        .workspaces(request.query.workspace)
+        .tasks.create({
+          taskChannel: 'voice',
+          attributes: JSON.stringify(taskAttributes)
+        })
+        .then(newTask => {
+          console.log('New task created');
+          // Remove worker from the first conference
+          console.log(
+            `Removing worker ${taskAttributes.conference.participants.worker} from conference ${taskAttributes.conference.sid}`
+          );
+          return client
+            .conferences(taskAttributes.conference.sid)
+            .participants(taskAttributes.conference.participants.worker)
+            .remove();
+        })
+        .then(() => {
+          console.log('Worker removed from conference');
+          response.send('');
+        });
     })
     .catch(error => {
       console.log(error);
-      response.send();
+      response.send('');
     });
 });
 
-app.get('/transfer', function(request, response) {
-  client.taskrouter.workspaces(request.query.workspace)
-     .tasks(request.query.task_sid)
-     .fetch()
-     .then(task => {
-        console.log('old task fetched')
-        var taskAttributes = JSON.parse(task.attributes);
-        taskAttributes.worker_name = process.env.AGENT2_NAME
-        client.taskrouter
-          .workspaces(request.query.workspace)
-          .tasks
-          .create({taskChannel: 'voice', attributes: JSON.stringify(taskAttributes)})
-          .then(newTask => {
-            console.log('New task created')
-            // Remove worker from the first conference 
-            console.log(`Removing worker ${taskAttributes.conference.participants.worker} from conference ${taskAttributes.conference.sid}`)
-            return client.conferences(taskAttributes.conference.sid)
-            .participants(taskAttributes.conference.participants.worker)
-            .remove()
+app.get('/complete-task', function(request, response) {
+  console.log('Complete task')
+  client.taskrouter
+        .workspaces(process.env.TWILIO_TR_WORKSPACE_SID)
+        .tasks(request.query.taskSid)
+        .update({
+            assignmentStatus: 'completed',
+            reason: 'worker requested'
           })
-          .then(() => {
-             console.log('Worker removed from conference') 
-             response.send('');
-          })
-     })
-     .catch(error => {
-         console.log(error)
-         response.send('')
-     })
-
+        .then(() => {
+          console.log('Task completed')
+          response.send('')
+        })
 })
 
 /**
@@ -112,7 +114,7 @@ app.get('/get-token', function(request, response) {
     channelId: workerSid
   });
 
-  console.log('Received token request for ' + workerSid)
+  console.log('Received token request for ' + workerSid);
 
   // Helper function to create Policy
   function buildWorkspacePolicy(options) {
@@ -150,12 +152,16 @@ app.get('/get-token', function(request, response) {
     buildWorkspacePolicy(),
     // Workspace subresources fetch Policy
     buildWorkspacePolicy({ resources: ['**'] }),
-    buildWorkspacePolicy({ resources: ['**'], method: 'POST' }),
     // Workspace Activities Update Policy
     buildWorkspacePolicy({ resources: ['Activities'], method: 'POST' }),
     // Workspace Activities Worker Reserations Policy
     buildWorkspacePolicy({
       resources: ['Workers', workerSid, 'Reservations', '**'],
+      method: 'POST'
+    }),
+    // Workspace Activities Task Reservations Policy - e.g. Create a conference
+    buildWorkspacePolicy({
+      resources: ['Tasks', '**'],
       method: 'POST'
     })
   ];
@@ -175,7 +181,9 @@ var server = http.createServer(app);
 var port = process.env.PORT || 3000;
 server.listen(port, function() {
   console.log('Express server running on *:' + port);
-  console.log(`Open two browser tabs at:\n* http://localhost:${port}/agent1.html\n* http://localhost:${port}/agent1.html`)
+  console.log(
+    `Open two browser tabs at:\n* http://localhost:${port}/agent1.html\n* http://localhost:${port}/agent1.html`
+  );
   // Enable ngrok
   ngrok
     .connect({
