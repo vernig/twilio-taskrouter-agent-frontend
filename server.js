@@ -22,7 +22,7 @@ const client = require('twilio')(
   process.env.TWILIO_ACCOUNT_SECRET
 );
 
-// Create Express webapp.
+// Create Express app
 var app = express();
 
 // Static pages goes in ./public folder
@@ -44,13 +44,9 @@ app.get('/create-conference', function(request, response) {
     .reservations(request.query.ReservationSid)
     .update({
       instruction: 'conference'
-      //  from: '+18001231234',
-      //  statusCallback: 'https://www.example.com/ConferenceEvents',
-      //  conferenceStatusCallbackEvent: ['start', 'end', 'join', 'leave', 'mute', 'hold']
     })
     .then(reservation => {
-      console.log('Conference done');
-      console.log(reservation.workerName);
+      console.log(`Conference established with worker: ${reservation.workerName}`);
       response.send();
     })
     .catch(error => {
@@ -66,7 +62,7 @@ app.get('/transfer', function(request, response) {
      .then(task => {
         console.log('old task fetched')
         var taskAttributes = JSON.parse(task.attributes);
-        taskAttributes.worker_name = "John Doe"
+        taskAttributes.worker_name = process.env.AGENT2_NAME
         client.taskrouter
           .workspaces(request.query.workspace)
           .tasks
@@ -178,6 +174,7 @@ var server = http.createServer(app);
 var port = process.env.PORT || 3000;
 server.listen(port, function() {
   console.log('Express server running on *:' + port);
+  console.log(`Open two browser tabs at:\n* http://localhost:${port}/agent1.html\n* http://localhost:${port}/agent1.html`)
   // Enable ngrok
   ngrok
     .connect({
