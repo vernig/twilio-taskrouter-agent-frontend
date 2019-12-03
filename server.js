@@ -174,7 +174,7 @@ var server = http.createServer(app);
 var port = process.env.PORT || 3000;
 server.listen(port, function() {
   console.log('Express server running on *:' + port);
-  console.log(`Open two browser tabs at:\n* http://localhost:${port}/agent1.html\n* http://localhost:${port}/agent1.html`)
+  console.log(`Open two browser tabs at:\n* http://localhost:${port}/agent1.html\n* http://localhost:${port}/agent2.html`)
   // Enable ngrok
   ngrok
     .connect({
