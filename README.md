@@ -1,4 +1,4 @@
-# Proof of concpet for Twilio TaskRouter agent frontend (with conference)
+# Proof of concept for Twilio TaskRouter agent frontend (with conference)
 
 ## Setup 
 
