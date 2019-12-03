@@ -45,7 +45,7 @@ app.get('/transfer', function(request, response) {
     .then(task => {
       console.log('old task fetched');
       var taskAttributes = JSON.parse(task.attributes);
-      taskAttributes.worker_name = process.env.AGENT2_NAME;
+      taskAttributes.worker_name = request.query.workerName || process.env.AGENT2_NAME;
       client.taskrouter
         .workspaces(request.query.workspace)
         .tasks.create({
@@ -53,7 +53,7 @@ app.get('/transfer', function(request, response) {
           attributes: JSON.stringify(taskAttributes)
         })
         .then(newTask => {
-          console.log('New task created');
+          console.log('New task created for worker ' + taskAttributes.worker_name);
           // Remove worker from the first conference
           console.log(
             `Removing worker ${taskAttributes.conference.participants.worker} from conference ${taskAttributes.conference.sid}`

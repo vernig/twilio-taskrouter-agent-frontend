@@ -18,11 +18,18 @@ function acceptReservation(reservationSid) {
 }
 
 function transferCall(taskSid, workspaceSid) {
-  fetch(
-    `/transfer?task_sid=${taskSid}&workspace=${workspaceSid}`
-  ).then(() => {
-    updateReservations();
-  });
+  Swal.fire({
+    text: 'Who do you want to trasnfer the call to?',
+    input: 'text'
+  })
+    .then(result =>
+      fetch(
+        `/transfer?task_sid=${taskSid}&workspace=${workspaceSid}&workerName=${result.value}`
+      )
+    )
+    .then(() => {
+      updateReservations();
+    });
 }
 
 function updateReservations() {
@@ -105,7 +112,9 @@ function registerWorker(workerSid) {
 }
 
 if (!WORKER_SID) {
-  window.alert('Provide worker sid in the url: e.g. http://yourserver.com/worker.html?workerSid=WKXXXX')
+  window.alert(
+    'Provide worker sid in the url: e.g. http://yourserver.com/worker.html?workerSid=WKXXXX'
+  );
   // log('WORKER_SID variable missing!', 'error');
 } else {
   registerWorker(WORKER_SID);
