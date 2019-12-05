@@ -1,23 +1,46 @@
+var workerClient;
 var worker;
+var workerActivities = {}
 
 // function log(message, type) {
 //   document.getElementById('log').innerHTML += `<p class="${
 //     type ? 'log-' + type : ''
 //   }">${message}</p>`;
 // }
+function fetchActivities() {
+  workerClient.activities.fetch(function(error, activityList) {
+    for (let activity of activityList.data) {
+      if (activity.friendlyName === "Offline") {
+        workerActivities.offline = activity.sid
+      } else if (activity.friendlyName === "Available")
+        workerActivities.available = activity.sid
+    }
+  })
+}
+
+function toggleWorkerAvailability() {
+  let newStatus = {"ActivitySid": worker.available ? workerActivities.offline : workerActivities.available}
+  workerClient.update(newStatus, (error, workerInfo) => {
+    worker = workerInfo
+    renderWorker(workerInfo)
+  })
+}
 
 function acceptReservation(reservationSid) {
-  worker.fetchReservations(function(error, reservations) {
+  workerClient.fetchReservations(function(error, reservations) {
     for (let reservation of reservations.data) {
       if (reservation.sid === reservationSid) {
         if (reservation.task.attributes.conference) {
           // There is already a conference, so it's likely a transfer
-          console.log('Joining conference ' + reservation.task.attributes.conference.room_name);
+          console.log(
+            'Joining conference ' +
+              reservation.task.attributes.conference.room_name
+          );
           reservation.call(
             null,
             'https://amber-ibis-1382.twil.io/join-conference?conferenceRoomName=' +
-            reservation.task.attributes.conference.room_name,
-            null, 
+              reservation.task.attributes.conference.room_name,
+            null,
             true
           );
         } else {
@@ -45,7 +68,7 @@ function transferCall(taskSid, workspaceSid) {
 }
 
 function updateReservations() {
-  worker.fetchReservations(function(error, reservations) {
+  workerClient.fetchReservations(function(error, reservations) {
     reservationGroup = document.getElementById('reservations-group');
     reservationGroup.innerHTML = '';
     reservations.data.forEach(reservation => {
@@ -103,21 +126,23 @@ function registerWorker(workerSid) {
     .then(response => response.text())
     .then(response => {
       const WORKER_TOKEN = response;
-      worker = new Twilio.TaskRouter.Worker(WORKER_TOKEN);
+      workerClient = new Twilio.TaskRouter.Worker(WORKER_TOKEN);
 
-      worker.on('ready', function(workerInfo) {
+      workerClient.on('ready', function(workerInfo) {
+        fetchActivities()
+        worker = workerInfo;
         renderWorker(workerInfo);
       });
 
-      worker.on('reservation.created', function(reservation) {
+      workerClient.on('reservation.created', function(reservation) {
         updateReservations();
       });
 
-      worker.on('reservation.accepted', function(reservation) {
+      workerClient.on('reservation.accepted', function(reservation) {
         updateReservations();
       });
 
-      worker.on('reservation.canceled', function(reservation) {
+      workerClient.on('reservation.canceled', function(reservation) {
         updateReservations();
       });
     });
