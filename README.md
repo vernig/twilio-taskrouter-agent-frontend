@@ -9,8 +9,8 @@ This proof of concept makes use of routing based on worker name. The flow is the
 * This operation will: 
   * Create a new task with `woker_name` attribute set to Agent2 name 
   * Remove Agent1 from the conference
-* Agent2 can now click on [Accept] to create a new conference between him and the customer
-* Agent1 (that is no longer in the call) can now wrap-up and complete the task (not implemented in this proof of concept)
+* Agent2 can now click on [Accept] tojoin the conference already established between Agent1 and the customer
+* Agent1 (that is no longer in the call) can now wrap-up and complete the task 
 
 ## Setup 
 
@@ -38,8 +38,6 @@ In order for this proof of concept to work, you need to setup a workflow in Task
   * `TWILIO_ACCOUNT_SID`
   * `TWILIO_ACCOUNT_SECRET`: this is the Twilio account auth token
   * `TWILIO_TR_WORKSPACE_SID`: this is your Twilio Taskrouter Workspace id
-  * `AGENT2_WORKER_NAME`: this is the name of the Agent2 worker
-* Fill in the `WORKER_SID` constant in `public/agent1.html` and `public/agent2.html`. Agent1 is the one receiving the call and making the transfer to Agent2
 * Install dependencies:
 ```
 npm install
@@ -49,16 +47,16 @@ npm install
 npm start
 ```
 
-* Open two browser tabs on
-  * http://localhost:3000/agent1.html
-  * http://localhost:3000/agent2.html
+* Open (at least) two browser tabs on:
+  * http://localhost:3000/worker.html?workerSid=<Agent 1 SID>
+  * http://localhost:3000/worker.html?workerSid=<Agent 2 SID>
 * Call the phone number from a phone 
-* When the call comes in, the [Accept] button on `agent1.html` gets enabled
-* Press the button, and a new call to the Agent1 phone is placed 
-* The [Transfer to Agent2] button gets enabled on `agent1.html` 
-* Once the call is on-going, press [Transfer to Agent2]
+* When the call comes in, a new  resewrvations appear on the Agent1 page
+* Press the [Accept] button, and a new call to the Agent1 phone is placed 
+* A new button [Transfer] will appear on the Agent1 screen
+* Click the [Transfer] button, and when prompted type the name of the Agent 2 in the popup
 * A new task is created and reserved to Agent2
 * Agent1 gets removed from the conference (this steps can be postponed to ensure warm transfering) 
-* The [Accept] button on `agent2.html` gets enabled 
-* Click on `agent2.html` [Accept] button
+* A new reservation is added to the Agent2 page and a [Accept] button appears on Agent2 page
+* Click the [Accept] button on Agent2 page
 * A new call is established with Agent2 phone and he can now talk to the customer
