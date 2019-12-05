@@ -10,7 +10,19 @@ function acceptReservation(reservationSid) {
   worker.fetchReservations(function(error, reservations) {
     for (let reservation of reservations.data) {
       if (reservation.sid === reservationSid) {
-        reservation.conference();
+        if (reservation.task.attributes.conference) {
+          // There is already a conference, so it's likely a transfer
+          console.log('Joining conference ' + reservation.task.attributes.conference.room_name);
+          reservation.call(
+            null,
+            'https://amber-ibis-1382.twil.io/join-conference?conferenceRoomName=' +
+            reservation.task.attributes.conference.room_name,
+            null, 
+            true
+          );
+        } else {
+          reservation.conference();
+        }
         break;
       }
     }

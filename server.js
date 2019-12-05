@@ -46,6 +46,7 @@ app.get('/transfer', function(request, response) {
       console.log('old task fetched');
       var taskAttributes = JSON.parse(task.attributes);
       taskAttributes.worker_name = request.query.workerName || process.env.AGENT2_NAME;
+      taskAttributes.conference.room_name = request.query.task_sid
       client.taskrouter
         .workspaces(request.query.workspace)
         .tasks.create({
