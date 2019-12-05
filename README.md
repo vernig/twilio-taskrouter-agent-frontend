@@ -25,8 +25,8 @@ In order for this proof of concept to work, you need to setup a workflow in Task
 * Note down the Workers' SIDs and their names (i.e. `worker_name`) because you need them in the following steps
 * Define a new workflow (or change the existing one) adding two filters: 
  * The first one has:
-   * Matching task: `worker_name != "any"`
-   * Worker expression: `task.worker_name == worker.worker_name`
+   * Matching task: `target_worker_name != "any"`
+   * Worker expression: `task.target_worker_name == worker.worker_name`
  * The second one has
    * Matching task: `1==1`
 * To ensure the incoming call are routed to Agent1, change the IVR that create a task when a calls comes in, to make sure the new task created has attributes `{"worker_name": "<name_of_agent1>"}`
