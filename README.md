@@ -48,6 +48,8 @@ npm install
 npm start
 ```
 
+![image](https://user-images.githubusercontent.com/54728384/70262423-3a591b80-178c-11ea-8ea7-6d5c7816cb96.png)
+
 * Open (at least) two browser tabs on:
   * http://localhost:3000/worker.html?workerSid=<Agent 1 SID>
   * http://localhost:3000/worker.html?workerSid=<Agent 2 SID>
