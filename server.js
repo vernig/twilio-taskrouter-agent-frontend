@@ -164,6 +164,11 @@ app.get('/get-token', function(request, response) {
     buildWorkspacePolicy({
       resources: ['Tasks', '**'],
       method: 'POST'
+    }),
+    // Workspace Workers - Upsate status of workers
+    buildWorkspacePolicy({
+      resources: ['Workers', '*'],
+      method: 'POST'
     })
   ];
 
@@ -183,7 +188,7 @@ var port = process.env.PORT || 3000;
 server.listen(port, function() {
   console.log('Express server running on *:' + port);
   console.log(
-    `Open (ate least) two browser tabs at:\n* http://localhost:${port}/worker.html?workerSid=<Worker SID>`
+    `Open (at least) two browser tabs at:\n* http://localhost:${port}/worker.html?workerSid=<Worker SID>`
   );
   // Enable ngrok
   ngrok
