@@ -38,6 +38,7 @@ In order for this proof of concept to work, you need to setup a workflow in Task
   * `TWILIO_ACCOUNT_SID`
   * `TWILIO_ACCOUNT_SECRET`: this is the Twilio account auth token
   * `TWILIO_TR_WORKSPACE_SID`: this is your Twilio Taskrouter Workspace id
+  * `AGENT2_NAME`: (optional) The name of the Agent to transfer the call 2 if none is provided
 * Install dependencies:
 ```
 npm install
