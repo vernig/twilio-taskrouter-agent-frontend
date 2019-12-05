@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script
+      type="text/javascript"
+      src="//media.twiliocdn.com/taskrouter/js/v1.20/taskrouter.min.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <title>Worker frontend</title>
+  </head>
+  <body class="mx-3">
+    <div id="worker">
+      <h4>Worker: <span id="worker-name"></span></h4>
+      <p>Activity: <span id="worker-activity"></span></p>
+      <p>Availability: <span id="worker-available"></span></p>
+    </div>
+    <div id="reservations">
+    <h3>Reservations</h3>
+      <ul class="list-group" id="reservations-group"></ul>
+      <!-- <button id="button-accept" class="btn btn-primary" disabled>
+        Accept
+      </button>
+      <button id="button-transfer" class="btn btn-primary" disabled>
+        Transfer to Agent2
+      </button> -->
+    </div>
+
+    <script>
+      // const WORKER_SID='WK5128c134121fae8a7872782f293762b7' // Agent1 Woker SID
+      urlParams = new URLSearchParams(window.location.search);
+      const WORKER_SID = urlParams.get('workerSid');
+    </script>
+    <script src="worker.js"></script>
+  </body>
+</html>
