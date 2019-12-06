@@ -58,7 +58,7 @@ function acceptReservation(reservationSid) {
 
 function transferCall(taskSid, workspaceSid) {
   Swal.fire({
-    text: 'Who do you want to trasnfer the call to?',
+    text: 'Who do you want to transfer the call to?',
     input: 'text'
   })
     .then(result =>
