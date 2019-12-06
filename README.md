@@ -12,6 +12,8 @@ This proof of concept makes use of routing based on worker name. The flow is the
 * Agent2 can now click on [Accept] tojoin the conference already established between Agent1 and the customer
 * Agent1 (that is no longer in the call) can now wrap-up and complete the task 
 
+![image](https://user-images.githubusercontent.com/54728384/70321829-53aba780-1820-11ea-93fa-6e5c13fb1fb4.png)
+
 ## Setup 
 
 In order for this proof of concept to work, you need to setup a workflow in Taskrouter: 
