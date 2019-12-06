@@ -12,6 +12,9 @@ This proof of concept makes use of routing based on worker name. The flow is the
 * Agent2 can now click on [Accept] tojoin the conference already established between Agent1 and the customer
 * Agent1 (that is no longer in the call) can now wrap-up and complete the task 
 
+![image](https://user-images.githubusercontent.com/40210035/70335313-f96e0f00-183e-11ea-9c3e-fe18c2ef65d9.png)
+
+
 ![image](https://user-images.githubusercontent.com/54728384/70321829-53aba780-1820-11ea-93fa-6e5c13fb1fb4.png)
 
 ## Setup 
