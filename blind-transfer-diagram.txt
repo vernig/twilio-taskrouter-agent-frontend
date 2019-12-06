@@ -1,0 +1,32 @@
+title Blind Transfer
+
+Customer->Twilio: Call
+Twilio->Twilio: Create a new task
+Twilio->Agent1: Reservation Request
+Agent1->Twilio: instruction: reservation.conference()
+note over Customer,Agent1
+Conference created between Agent1 and customer. 
+Conference room name is the task SID 
+end note
+note over Agent1: Transfer call 
+end note
+Agent1->Twilio: Remove Agent1 from conference
+Agent1->Twilio: Clone task
+note over Twilio,Agent1
+The cloned task has all the attributes of the old task, plus:
+* "conference.room_name" set to old task SID
+* "target_worker_name": set to Agent 2 "worker_name"
+end note
+Twilio->Agent2: Reservation Request
+Agent2->Twilio: instruction: reservation.call() with callUrl specified
+Twilio->Twilio: Calling TwimL specified by callUrl
+note over Twilio
+The TwimL includes a conference instruction
+with conference room name set as the task SID
+end note
+Twilio->Agent2: Adding Agent2 to conference
+note over Customer, Agent2
+Agent2 now joins the conference setup previously by Agent1 with customer
+end note
+
+[Created with https://www.websequencediagrams.com/]
