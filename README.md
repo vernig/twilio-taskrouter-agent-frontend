@@ -36,6 +36,19 @@ In order for this proof of concept to work, you need to setup a workflow in Task
    * Matching task: `1==1`
 * To ensure the incoming call are routed to Agent1, change the IVR that create a task when a calls comes in, to make sure the new task created has attributes `{"worker_name": "<name_of_agent1>"}`
  
+### Set-up incoming call 
+
+* Create a new studio flow
+* Add an enqueue widget and connect it to "incoming call"
+* In the propery of the widget set: 
+  * `Queue or Task Router Task`: `TaskRouter Task`
+  * `Task Router Workspace`: your workspace 
+  * `Task Router Workflow`: your workflow 
+  * `Task Attributes (JSON)`: `{"target_worker_name": "<name of the main agent>"}`
+* Save and Publish the Flow 
+* Go to the [Phone Numbers section of the console](https://www.twilio.com/console/phone-numbers/incoming) 
+* Click on the number 
+* In the "A Call Comes in" set "Studio Flow" and select the studio flow you just created
 ## Start
 
 * Rename `.env.template` to `.env`
