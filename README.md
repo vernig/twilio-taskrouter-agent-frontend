@@ -6,25 +6,6 @@ What is implemented so far is:
 * Toggle worker status (available / unavailable)
 * Interact with tasks / reservations (accept, complete)
 * Transfer a voice call to another agent (see more below)
-
-## Setup 
-
-In order for this proof of concept to work, you need to setup a workflow in Taskrouter: 
-* Have two workers (Agent1 and Agent2). For each of them make sure that (at least) the following attributes are defined: 
-```
-{"contact_uri":"<phone_number>","worker_name":"<name>"}
-```
-  * where: 
-    * <phone_number>: is the phone number of the Agent1 (in this demo we use real phones, but the same can be achieved with sofphone and using the Twilio Voice SDK)
-    * <name>: Name of the worker.
-* Note down the Workers' SIDs and their names (i.e. `worker_name`) because you need them in the following steps
-* Define a new workflow (or change the existing one) adding two filters: 
- * The first one has:
-   * Matching task: `target_worker_name != "any"`
-   * Worker expression: `task.target_worker_name == worker.worker_name`
- * The second one has
-   * Matching task: `1==1`
-* To ensure the incoming call are routed to Agent1, change the IVR that create a task when a calls comes in, to make sure the new task created has attributes `{"worker_name": "<name_of_agent1>"}`
  
 ## Start
 
@@ -34,7 +15,7 @@ In order for this proof of concept to work, you need to setup a workflow in Task
   * `TWILIO_ACCOUNT_SECRET`: this is the Twilio account auth token
   * `TWILIO_TR_WORKSPACE_SID`: this is your Twilio Taskrouter Workspace id
   * `TWILIO_API_KEY` and `TWILIO_API_SECRET`: this is the API key/secret used to enable voice client. create a new API key/secret [here](https://www.twilio.com/console/phone-numbers/project/api-keys)
-  * `AGENT2_NAME`: (optional) The name of the Agent to transfer the call 2 if none is provided
+  * `AGENT2_NAME`: (optional for the transfer use case) The name of the Agent to transfer the call 2 if none is provided
 * Install dependencies:
 ```
 npm install
@@ -61,7 +42,6 @@ Then make sure you have a worker with `contact_uri` in the attributes:
 
 Grab the worker sid of the  worker and then open the following url on your browser: http://localhost:3000/worker.html?workerSid=<WKXXXXX>. If everything is set-up correctly you should be seeing the "Voice Client controls" (both buttons greyed out). 
 
-
 ## Test 
 
 * Make a call to the number you configured above. A new reservation is created for your agent. 
@@ -70,7 +50,28 @@ Grab the worker sid of the  worker and then open the following url on your brows
 * Click on "Answer Call" to accept the call 
 * Now you will be connected with the other peers in a conference
 
+![voice-client-demo](https://user-images.githubusercontent.com/54728384/92963102-d6c1f400-f469-11ea-9a40-61c10d4b8dd0.gif)
+
 # Proof of concept for Agent call transfer using Twilio TaskRouter
+
+## Additional Setup 
+
+In order for this proof of concept to work, you need to setup a workflow in Taskrouter: 
+* Have two workers (Agent1 and Agent2). For each of them make sure that (at least) the following attributes are defined: 
+```
+{"contact_uri":"<phone_number>","worker_name":"<name>"}
+```
+  * where: 
+    * <phone_number>: is the phone number of the Agent1 (in this demo we use real phones, but the same can be achieved with sofphone and using the Twilio Voice SDK)
+    * <name>: Name of the worker.
+* Note down the Workers' SIDs and their names (i.e. `worker_name`) because you need them in the following steps
+* Define a new workflow (or change the existing one) adding two filters: 
+ * The first one has:
+   * Matching task: `target_worker_name != "any"`
+   * Worker expression: `task.target_worker_name == worker.worker_name`
+ * The second one has
+   * Matching task: `1==1`
+* To ensure the incoming call are routed to Agent1, change the IVR that create a task when a calls comes in, to make sure the new task created has attributes `{"worker_name": "<name_of_agent1>"}`
 
 ## Flow
 
