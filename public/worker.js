@@ -8,7 +8,7 @@ var workerActivities = {};
 //   }">${message}</p>`;
 // }
 function fetchActivities() {
-  workerClient.activities.fetch(function(error, activityList) {
+  workerClient.activities.fetch(function (error, activityList) {
     for (let activity of activityList.data) {
       if (activity.friendlyName === 'Offline') {
         workerActivities.offline = activity.sid;
@@ -22,7 +22,7 @@ function toggleWorkerAvailability() {
   let newStatus = {
     ActivitySid: worker.available
       ? workerActivities.offline
-      : workerActivities.available
+      : workerActivities.available,
   };
   workerClient.update(newStatus, (error, workerInfo) => {
     worker = workerInfo;
@@ -31,7 +31,7 @@ function toggleWorkerAvailability() {
 }
 
 function acceptReservation(reservationSid) {
-  workerClient.fetchReservations(function(error, reservations) {
+  workerClient.fetchReservations(function (error, reservations) {
     for (let reservation of reservations.data) {
       if (reservation.sid === reservationSid) {
         if (reservation.task.attributes.conference) {
@@ -59,9 +59,9 @@ function acceptReservation(reservationSid) {
 function transferCall(taskSid, workspaceSid) {
   Swal.fire({
     text: 'Who do you want to transfer the call to?',
-    input: 'text'
+    input: 'text',
   })
-    .then(result =>
+    .then((result) =>
       fetch(
         `/transfer?task_sid=${taskSid}&workspace=${workspaceSid}&workerName=${result.value}`
       )
@@ -72,10 +72,10 @@ function transferCall(taskSid, workspaceSid) {
 }
 
 function updateReservations() {
-  workerClient.fetchReservations(function(error, reservations) {
+  workerClient.fetchReservations(function (error, reservations) {
     reservationGroup = document.getElementById('reservations-group');
     reservationGroup.innerHTML = '';
-    reservations.data.forEach(reservation => {
+    reservations.data.forEach((reservation) => {
       if (reservation.reservationStatus !== 'timeout') {
         reservationGroup.innerHTML =
           `<li class="list-group-item">Reservation SID: ${
@@ -132,28 +132,98 @@ function renderWorker(workerInfo) {
   updateReservations();
 }
 
+function enableButton(buttonId, className) {
+  const button = document.getElementById(buttonId)
+  button.classList.add(className)
+  button.classList.remove('btn-outline-secondary')
+  button.disabled = false;
+}
+
+function disableButton(buttonId, className) {
+  const button = document.getElementById(buttonId)
+  button.disabled = true;
+  button.classList.add('btn-outline-secondary')
+  button.classList.remove(className)
+}
+
+function registerTwilioDevice(clientId) {
+  fetch(`/get-client-token?clientId=${clientId}`)
+    .then((response) => response.json())
+    .then((response) => {
+      // Setup Twilio.Device
+      device = new Twilio.Device(response.token, {
+        codecPreferences: ['opus', 'pcmu'],
+        enableRingingState: true,
+        sounds: {"incoming": "/ring.mp3"}
+      });
+
+      device.on('ready', function (device) {
+        console.log('Twilio.Device Ready!');
+        document.getElementById('call-controls').style.display = 'block';
+        document.getElementById('button-hangup').onclick = function () {
+          console.log('Hanging up...');
+          if (device) {
+            device.disconnectAll();
+          }
+        };
+      });
+
+      device.on('error', function (error) {
+        console.log('Twilio.Device Error: ' + error.message);
+      });
+
+      device.on('connect', function (conn) {
+        console.log('Successfully established call!');
+        disableButton('button-answer', 'btn-outline-success')
+        enableButton('button-hangup', 'btn-outline-danger')
+      });
+
+      device.on('disconnect', function (conn) {
+        console.log('Call ended.');
+        disableButton('button-answer', 'btn-outline-success')
+        disableButton('button-hangup', 'btn-outline-danger')
+      });
+
+      device.on('incoming', function (conn) {
+        console.log('Incoming connection from ' + conn.parameters.From);
+        enableButton('button-answer', 'btn-outline-success')
+        document.getElementById('button-answer').onclick = () => {
+          conn.accept();
+        };
+      });
+    });
+}
+
 function registerWorker(workerSid) {
   fetch('/get-token?workerSid=' + workerSid)
-    .then(response => response.text())
-    .then(response => {
+    .then((response) => response.text())
+    .then((response) => {
       const WORKER_TOKEN = response;
       workerClient = new Twilio.TaskRouter.Worker(WORKER_TOKEN);
 
-      workerClient.on('ready', function(workerInfo) {
+      workerClient.on('ready', function (workerInfo) {
         fetchActivities();
         worker = workerInfo;
+        if (
+          workerInfo.attributes.contact_uri &&
+          workerInfo.attributes.contact_uri.startsWith('client:')
+        ) {
+          registerTwilioDevice(workerInfo.attributes.contact_uri.slice(7));
+        } else {
+          console.warn('Twilio Audio device not enabled. The worker "contact_uri" is either missing or not in the form "client:xxxx"')
+        }
         renderWorker(workerInfo);
       });
 
-      workerClient.on('reservation.created', function(reservation) {
+      workerClient.on('reservation.created', function (reservation) {
         updateReservations();
       });
 
-      workerClient.on('reservation.accepted', function(reservation) {
+      workerClient.on('reservation.accepted', function (reservation) {
         updateReservations();
       });
 
-      workerClient.on('reservation.canceled', function(reservation) {
+      workerClient.on('reservation.canceled', function (reservation) {
         updateReservations();
       });
     });
