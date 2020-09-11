@@ -16,11 +16,11 @@
     "cors": "^2.8.5",
     "dotenv": "^4.0.0",
     "express": "^4.15.2",
-    "ngrok": "^3.2.5",
-    "twilio": "^3.37.1"
+    "ngrok": "^3.3.0",
+    "twilio": "^3.49.1"
   },
   "devDependencies": {
-    "nodemon": "^1.19.2"
+    "nodemon": "^2.0.4"
   },
   "nodemonConfig": {
     "ignore": [
