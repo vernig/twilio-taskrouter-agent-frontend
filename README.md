@@ -1,21 +1,11 @@
-# Proof of concept for Agent call transfer using Twilio TaskRouter
+# Agent interface for Twilio TaskRouter 
 
-## Flow
+This repo is a very basic user interface to perform some operations on TaskRouter using [TaskRouterJS](https://www.twilio.com/docs/taskrouter/js-sdk). 
 
-This proof of concept makes use of routing based on worker name. The flow is the following: 
-* A call comes in and a new task is created and assigned to Agent1
-* Agent1 use the [Accept] button on his web page to accept the call and create a conference with the customer
-* Once the conference is established, the Agent1 can use the [Transfer to Agent2] button to transfer the call
-* This operation will: 
-  * Create a new task with `woker_name` attribute set to Agent2 name 
-  * Remove Agent1 from the conference
-* Agent2 can now click on [Accept] tojoin the conference already established between Agent1 and the customer
-* Agent1 (that is no longer in the call) can now wrap-up and complete the task 
-
-![image](https://user-images.githubusercontent.com/40210035/70337380-dcd3d600-1842-11ea-9465-c31d84108751.png)
-
-
-![image](https://user-images.githubusercontent.com/54728384/70321829-53aba780-1820-11ea-93fa-6e5c13fb1fb4.png)
+What is implemented so far is: 
+* Toggle worker status (available / unavailable)
+* Interact with tasks / reservations (accept, complete)
+* Transfer a voice call to another agent (see more below)
 
 ## Setup 
 
@@ -43,6 +33,7 @@ In order for this proof of concept to work, you need to setup a workflow in Task
   * `TWILIO_ACCOUNT_SID`
   * `TWILIO_ACCOUNT_SECRET`: this is the Twilio account auth token
   * `TWILIO_TR_WORKSPACE_SID`: this is your Twilio Taskrouter Workspace id
+  * `TWILIO_API_KEY` and `TWILIO_API_SECRET`: this is the API key/secret used to enable voice client. create a new API key/secret [here](https://www.twilio.com/console/phone-numbers/project/api-keys)
   * `AGENT2_NAME`: (optional) The name of the Agent to transfer the call 2 if none is provided
 * Install dependencies:
 ```
@@ -52,6 +43,53 @@ npm install
 ```
 npm start
 ```
+
+# Simple Voice Call 
+
+## Additional setup 
+ 
+First of all, create a new Twiml or a Studio Flow which enqueue a call into your taskrouter workspace and connect it to a phone number.   
+
+Then make sure you have a worker with `contact_uri` in the attributes:  
+
+```
+{
+  ...
+  "contact_uri": "client:xxxx"
+}
+```
+
+Grab the worker sid of the  worker and then open the following url on your browser: http://localhost:3000/worker.html?workerSid=<WKXXXXX>. If everything is set-up correctly you should be seeing the "Voice Client controls" (both buttons greyed out). 
+
+
+## Test 
+
+* Make a call to the number you configured above. A new reservation is created for your agent. 
+* Click on "Accept"
+* Your browser will start to ring 
+* Click on "Answer Call" to accept the call 
+* Now you will be connected with the other peers in a conference
+
+# Proof of concept for Agent call transfer using Twilio TaskRouter
+
+## Flow
+
+This proof of concept makes use of routing based on worker name. The flow is the following: 
+* A call comes in and a new task is created and assigned to Agent1
+* Agent1 use the [Accept] button on his web page to accept the call and create a conference with the customer
+* Once the conference is established, the Agent1 can use the [Transfer to Agent2] button to transfer the call
+* This operation will: 
+  * Create a new task with `woker_name` attribute set to Agent2 name 
+  * Remove Agent1 from the conference
+* Agent2 can now click on [Accept] tojoin the conference already established between Agent1 and the customer
+* Agent1 (that is no longer in the call) can now wrap-up and complete the task 
+
+![image](https://user-images.githubusercontent.com/40210035/70337380-dcd3d600-1842-11ea-9465-c31d84108751.png)
+
+
+![image](https://user-images.githubusercontent.com/54728384/70321829-53aba780-1820-11ea-93fa-6e5c13fb1fb4.png)
+
+## Test 
 
 ![image](https://user-images.githubusercontent.com/54728384/70262423-3a591b80-178c-11ea-8ea7-6d5c7816cb96.png)
 
