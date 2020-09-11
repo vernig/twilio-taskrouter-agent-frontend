@@ -6,8 +6,22 @@ What is implemented so far is:
 * Toggle worker status (available / unavailable)
 * Interact with tasks / reservations (accept, complete)
 * Transfer a voice call to another agent (see more below)
- 
-## Start
+
+### Set-up incoming call handler (Studio Flow)
+
+* Create a new Studio Flow
+* Add an enqueue widget and connect it to "incoming call"
+* In the propery of the widget set: 
+  * `Queue or Task Router Task`: `TaskRouter Task`
+  * `Task Router Workspace`: your workspace 
+  * `Task Router Workflow`: your workflow 
+  * `Task Attributes (JSON)`: `{"target_worker_name": "<name of the main agent>"}`
+* Save and Publish the Flow 
+* Go to the [Phone Numbers section of the console](https://www.twilio.com/console/phone-numbers/incoming) 
+* Click on the number 
+* In the "A Call Comes in" set "Studio Flow" and select the studio flow you just created
+
+## Start server
 
 * Rename `.env.template` to `.env`
 * Fill in values for:
@@ -29,9 +43,7 @@ npm start
 
 ## Additional setup 
  
-First of all, create a new Twiml or a Studio Flow which enqueue a call into your taskrouter workspace and connect it to a phone number.   
-
-Then make sure you have a worker with `contact_uri` in the attributes:  
+Make sure you have a worker with `contact_uri` in the attributes:  
 
 ```
 {
