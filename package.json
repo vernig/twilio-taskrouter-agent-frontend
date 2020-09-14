@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "Taskrouter Agent frontend",
   "scripts": {
-    "start": "node server",
-    "start-dev": "nodemon server"
+    "start": "twilio-run",
+    "deploy": "twilio-run deploy"
   },
   "keywords": [
     "twilio",
@@ -13,18 +13,9 @@
   "author": "gverni",
   "license": "MIT",
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^4.0.0",
-    "express": "^4.15.2",
-    "ngrok": "^3.3.0",
-    "twilio": "^3.49.1"
+    "dotenv": "^4.0.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.4"
-  },
-  "nodemonConfig": {
-    "ignore": [
-      "public/*"
-    ]
+    "twilio-run": "^2.6.0"
   }
 }
