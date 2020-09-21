@@ -42,7 +42,7 @@ function acceptReservation(reservationSid) {
           );
           reservation.call(
             null,
-            'https://amber-ibis-1382.twil.io/join-conference?conferenceRoomName=' +
+            `${window.location.protocol}://${window.location.hostname}/join-conference?conferenceRoomName=` +
               reservation.task.attributes.conference.room_name,
             null,
             true
@@ -63,7 +63,7 @@ function transferCall(taskSid, workspaceSid) {
   })
     .then((result) =>
       fetch(
-        `/transfer?task_sid=${taskSid}&workspace=${workspaceSid}&workerName=${result.value}`
+        `/task-transfer?task_sid=${taskSid}&workspace=${workspaceSid}&workerName=${result.value}`
       )
     )
     .then(() => {
@@ -92,7 +92,7 @@ function updateReservations() {
 }
 
 function completeTask(taskSid) {
-  fetch(`/complete-task?taskSid=${taskSid}`).then(() => {
+  fetch(`/task-complete?taskSid=${taskSid}`).then(() => {
     updateReservations();
   });
 }
@@ -195,7 +195,7 @@ function registerTwilioDevice(clientId) {
 }
 
 function registerWorker(workerSid) {
-  fetch('/get-token?workerSid=' + workerSid)
+  fetch('/get-tr-token?workerSid=' + workerSid)
     .then((response) => response.text())
     .then((response) => {
       const WORKER_TOKEN = response;
